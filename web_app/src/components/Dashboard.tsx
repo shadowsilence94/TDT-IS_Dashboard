@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { signOut } from '../firebase';
 import { auth } from '../firebase';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area, BarChart, Bar, Legend, PieChart, Pie, Cell } from 'recharts';
-import { LogOut, Map, TrendingUp, Users, Activity, Info, UsersIcon, Calculator, Zap } from 'lucide-react';
 
 const COLORS = ['#3b82f6', '#c084fc', '#4ade80', '#ef4444', '#f59e0b'];
 
 const formatValue = (num: number) => {
+  if (!num) return '0 ฿';
   if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T ฿';
   if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B ฿';
   if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M ฿';
@@ -14,6 +14,7 @@ const formatValue = (num: number) => {
 };
 
 const formatNumber = (num: number) => {
+  if (!num) return '0';
   if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
   if (num >= 1e3) return (num / 1e3).toFixed(0) + 'K';
   return num.toString();
@@ -54,7 +55,6 @@ export default function Dashboard({ user }: { user: any }) {
   const totalTourists = regional.reduce((sum: number, r: any) => sum + (r.no_tourist_all || 0), 0);
   const totalRevenue = regional.reduce((sum: number, r: any) => sum + (r.revenue_all || 0), 0);
 
-  // Simulated Revenue Calculation using ML regression parameter (฿/visitor)
   const simulatedRevenue = modelParams 
     ? Math.max(0, (simulatedVisitors * modelParams.revenue_per_tourist + modelParams.intercept))
     : 0;
@@ -64,69 +64,76 @@ export default function Dashboard({ user }: { user: any }) {
       <main className="main-content">
         <header style={{ borderBottom: '1px solid var(--glass-border)', paddingBottom: '1.5rem', display:'flex', flexWrap:'wrap', gap:'20px' }}>
           <div style={{flex: 1}}>
-            <h1 style={{margin:0, fontSize:'2.2rem'}}>Thailand Tourism Intelligence (TDT-IS)</h1>
-            <p style={{color:'var(--text-muted)', margin:'4px 0'}}>Phase 2 Progress Report: Real-time Analytics & Forecasting Engine</p>
+            <h1 style={{margin:0, fontSize:'2rem', letterSpacing:'-0.02em'}}>TDT-IS: Tourism Intelligence System</h1>
+            <p style={{color:'var(--text-muted)', margin:'4px 0', fontSize:'0.95rem'}}>Phase 2 Progress Report | Sustainable Tourism & Regional Economic Balance</p>
             <div style={{ display: 'flex', flexWrap:'wrap', gap: '8px', marginTop: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(59, 130, 246, 0.1)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.2)' }}>
-                <UsersIcon size={14} /> <b>Team:</b> Alston, Subhajit, Santhosh, Htut Ko Ko
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.8rem', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)' }}>
+                TEAM: Alston, Subhajit, Santhosh, Htut Ko Ko
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(74, 222, 128, 0.1)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', color: '#4ade80', border: '1px solid rgba(74,222,128,0.2)' }}>
-                <Zap size={14} /> <b>Status:</b> Live Machine Learning Pipeline (Prophet/Regression)
+              <div style={{ background: 'rgba(59, 130, 246, 0.1)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.8rem', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.2)' }}>
+                MODELS: Prophet, Linear Regression, CCI
               </div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <span style={{ color: 'var(--text-muted)', fontSize:'0.9rem' }}>{user?.email}</span>
-            <button className="btn-secondary" onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <LogOut size={18} /> Logout
+            <button className="btn-secondary" onClick={handleLogout} style={{ fontSize:'0.9rem', padding:'8px 16px' }}>
+              LOGOUT
             </button>
           </div>
         </header>
 
-        <div className="dashboard-grid" style={{ marginTop: '2rem' }}>
+        <section style={{marginTop: '1.5rem', padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border:'1px solid var(--glass-border)'}}>
+            <h2 style={{fontSize:'1.1rem', marginBottom:'10px', color:'#f1f5f9'}}>Executive Summary & Policy Alignment</h2>
+            <p style={{color:'var(--text-muted)', fontSize:'0.85rem', lineHeight:'1.6'}}>
+                This dashboard is designed for <b>Government Officials, policy makers, and tourism industry investors</b>. 
+                Our objective is to leverage data-driven insights to achieve <b>balanced economic growth</b> and <b>sustainable tourism practices</b>. 
+                By monitoring the Carrying Capacity Index (CCI) and forecasting future arrivals, we provide actionable evidence for effective resource allocation and overtourism mitigation.
+            </p>
+        </section>
+
+        <div className="dashboard-grid" style={{ marginTop: '1.5rem' }}>
           
-          {/* Dashboard KPIs with REAL data */}
           <div className="glass-panel kpi-card">
-            <div className="kpi-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Users size={16}/> Historical Market Volume</div>
-            <div className="kpi-value">{totalTourists ? formatNumber(totalTourists) : 'Calculating...'}</div>
-            <div style={{color: '#94a3b8', fontSize: '0.8rem'}}>Aggregate arrivals across all provinces.</div>
+            <div className="kpi-title">TOTAL VISITORS (HISTORICAL)</div>
+            <div className="kpi-value">{totalTourists ? formatNumber(totalTourists) : '...'}</div>
+            <div style={{color: '#94a3b8', fontSize: '0.75rem'}}>Market volume across 77 provinces.</div>
           </div>
           <div className="glass-panel kpi-card">
-            <div className="kpi-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Activity size={16}/> Documented Economy</div>
-            <div className="kpi-value" style={{color:'#60a5fa'}}>{totalRevenue ? formatValue(totalRevenue) : 'Calculating...'}</div>
-            <div style={{color: '#94a3b8', fontSize: '0.8rem'}}>Direct tourism revenue documented (MOTS).</div>
+            <div className="kpi-title">TOTAL REVENUE (฿)</div>
+            <div className="kpi-value" style={{color:'#60a5fa'}}>{totalRevenue ? formatValue(totalRevenue) : '...'}</div>
+            <div style={{color: '#94a3b8', fontSize: '0.75rem'}}>Direct economic contribution.</div>
           </div>
           <div className="glass-panel kpi-card">
-            <div className="kpi-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}><TrendingUp size={16}/> Seasonal Sensitivity</div>
-            <div className="kpi-value" style={{color:'#c084fc'}}>High Variance</div>
-            <div style={{color: '#94a3b8', fontSize: '0.8rem'}}>Prophet model detected 12-Month cycles.</div>
+            <div className="kpi-title">MODEL STATUS</div>
+            <div className="kpi-value" style={{color:'#c084fc'}}>ACTIVE</div>
+            <div style={{color: '#94a3b8', fontSize: '0.75rem'}}>Prophet & Regression engines live.</div>
           </div>
 
-          {/* WHAT-IF SIMULATION TOOL (Real Regression Model Parameter) */}
-          <div className="glass-panel chart-card" style={{ gridColumn: 'span 12', padding: '2rem', background: 'rgba(15, 23, 42, 0.4)' }}>
+          <div className="glass-panel chart-card" style={{ gridColumn: 'span 12', padding: '1.5rem', background: 'rgba(15, 23, 42, 0.4)' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px', marginBottom: '1.5rem' }}>
-              <div style={{maxWidth: '600px'}}>
-                <h3 className="chart-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#60a5fa' }}>
-                  <Calculator size={24} /> Decision Support: What-If Revenue Forecast Simulation
+              <div style={{maxWidth: '700px'}}>
+                <h3 className="chart-title" style={{ color: '#60a5fa', marginBottom: '8px' }}>
+                  Policy Tool: What-If Revenue Forecast Simulation
                 </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '10px', lineHeight: '1.5' }}>
-                  <b>Methodology:</b> Based on our <b>Linear Regression Analysis</b> of 2019-2023 data, we discovered that each additional visitor contributes approximately <b>฿{modelParams?.revenue_per_tourist.toFixed(2)}</b> to the national economy. Adjust the monthly visitor target below to predict total revenue.
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                  <b>Model:</b> Scikit-Learn Linear Regression. <br/>
+                  <b>Logic:</b> Simulates the impact of visitor volume on regional revenue. This tool allows policy makers to estimate the potential ROI of infrastructure projects in specific regions.
                 </p>
               </div>
-              <div style={{ textAlign: 'right', background: 'rgba(255,255,255,0.05)', padding:'1.5rem', borderRadius:'16px', border:'1px solid rgba(74,222,128,0.2)', minWidth:'300px' }}>
-                <div style={{ fontSize: '0.85rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing:'0.05em' }}>Simulated Monthly Revenue</div>
-                <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#4ade80', margin:'8px 0' }}>
+              <div style={{ textAlign: 'right', background: 'rgba(255,b255,255,0.03)', padding:'1rem 1.5rem', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '0.8rem', color: '#94a3b8', textTransform: 'uppercase' }}>PROJECTED REVENUE</div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#4ade80', margin:'4px 0' }}>
                   {formatValue(simulatedRevenue)}
                 </div>
-                <div style={{fontSize:'0.8rem', color:'#4ade8088'}}>↑ Prediction confidence based on R²: 0.79</div>
               </div>
             </div>
             
             <div style={{ display: 'flex', flexWrap:'wrap', gap: '2rem', alignItems: 'center' }}>
               <div style={{ flex: 1, minWidth: '300px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
-                  <label style={{ fontSize: '1rem', fontWeight: '700' }}>Target Visitors (Month)</label>
-                  <span style={{ color: '#60a5fa', fontWeight: '800', fontSize:'1.1rem' }}>{new Intl.NumberFormat('en').format(simulatedVisitors)} Tourists</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize:'0.9rem' }}>
+                  <span>Target Monthly Visitors:</span>
+                  <span style={{ color: '#60a5fa', fontWeight: '700' }}>{new Intl.NumberFormat('en').format(simulatedVisitors)}</span>
                 </div>
                 <input 
                   type="range" 
@@ -135,121 +142,104 @@ export default function Dashboard({ user }: { user: any }) {
                   step="100000" 
                   value={simulatedVisitors} 
                   onChange={(e) => setSimulatedVisitors(parseInt(e.target.value))}
-                  style={{ width: '100%', height: '10px', cursor: 'pointer', accentColor: '#3b82f6' }}
+                  style={{ width: '100%', height: '6px', cursor: 'pointer', accentColor: '#3b82f6' }}
                 />
-                <div style={{display:'flex', justifyContent:'space-between', fontSize:'0.75rem', color:'var(--text-muted)', marginTop:'8px'}}>
-                  <span>Min Activity (10%)</span>
-                  <span>Historic Baseline: {formatNumber(modelParams?.baseline_visitors || 0)}</span>
-                  <span>Aggressive Growth (300%)</span>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Time Series Output */}
-          <div className="glass-panel chart-card" style={{ height: '450px' }}>
+          <div className="glass-panel chart-card" style={{ height: '400px' }}>
             <div className="chart-header">
-              <h3 className="chart-title">Arrival Projections (Prophet AI Output)</h3>
+              <h3 className="chart-title">Arrival Projections (Prophet Forecasting)</h3>
             </div>
-             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-              <b>Analytical Insight:</b> Our Prophet model isolated seasonal peaks corresponding to Songkran (April) and New Year (December). The 12-month extension predicts a sustainable plateau rather than a vertical return, accounting for economic cooling factors.
+             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
+              <b>Model:</b> Facebook Prophet. <br/>
+              <b>Insight:</b> Predicts future domestic travel demand to support resource allocation. Seasonal peaks align with Ministry of Tourism historic benchmarks.
             </p>
-            <ResponsiveContainer width="100%" height="70%">
+            <ResponsiveContainer width="100%" height="65%">
               <AreaChart data={forecast}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
                 <XAxis dataKey="ds" stroke="var(--text-muted)" tickFormatter={(v) => v?.slice(2, 7)} fontSize={10} />
                 <YAxis stroke="var(--text-muted)" tickFormatter={(v) => `${(v/1e6).toFixed(0)}M`} fontSize={10} />
                 <Tooltip labelStyle={{color: 'black'}} formatter={(value: any) => new Intl.NumberFormat('en').format(Math.round(Number(value) || 0))} />
-                <Legend iconType="circle" />
-                <Area type="monotone" dataKey="actual" name="Historical Observed" stroke="#3b82f6" fillOpacity={0.2} fill="#3b82f6" strokeWidth={2} />
-                <Area type="monotone" dataKey="yhat" name="Machine Learning Forecast" stroke="#c084fc" fillOpacity={0.2} fill="#c084fc" strokeDasharray="5 5" strokeWidth={2} />
+                <Area type="monotone" dataKey="actual" name="History" stroke="#3b82f6" fillOpacity={0.1} fill="#3b82f6" />
+                <Area type="monotone" dataKey="yhat" name="Forecast" stroke="#c084fc" fillOpacity={0.1} fill="#c084fc" strokeDasharray="5 5" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Revenue Distribution (Top 10) */}
-          <div className="glass-panel chart-card half" style={{ height: '500px' }}>
+          <div className="glass-panel chart-card half" style={{ height: '450px' }}>
             <div className="chart-header">
               <h3 className="chart-title">Revenue Concentration Index</h3>
             </div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.2rem', lineHeight: '1.5' }}>
-              <b>Finding:</b> Analysis of 77 provinces confirms high economic centralisation in <b>Bangkok, Phuket and Chonburi</b>. To meet Phase 2 proposal objectives, we designated secondary provinces as "Target Growth Areas" to distribute this revenue.
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                Ranks provinces by economic contribution to identify areas of dependency vs opportunity for redistribution to secondary cities.
             </p>
-            <ResponsiveContainer width="100%" height="75%">
+            <ResponsiveContainer width="100%" height="70%">
               <BarChart data={topProvinces} layout="vertical" margin={{ left: 50, right: 30 }}>
                 <YAxis dataKey="province_eng" type="category" stroke="var(--text-muted)" width={110} fontSize={11} />
                 <XAxis type="number" stroke="var(--text-muted)" tickFormatter={(v) => `${(v/1e9).toFixed(1)}B`} fontSize={10} />
-                <Tooltip labelStyle={{color: 'black'}} formatter={(val) => formatValue(Number(val))} />
-                <Bar dataKey="revenue_all" fill="#c084fc66" stroke="#c084fc" radius={[0, 4, 4, 0]} name="Province Revenue" />
+                <Tooltip labelStyle={{color: 'black'}} formatter={(val: any) => formatValue(Number(val) || 0)} />
+                <Bar dataKey="revenue_all" fill="#c084fc44" stroke="#c084fc" radius={[0, 2, 2, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Demographics / Structure */}
-          <div className="glass-panel chart-card half" style={{ height: '500px' }}>
+          <div className="glass-panel chart-card half" style={{ height: '450px' }}>
             <div className="chart-header">
-              <h3 className="chart-title">Structural Market Breakdown</h3>
+              <h3 className="chart-title">Market Structure Breakdown</h3>
             </div>
-             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.2rem', lineHeight: '1.5' }}>
-              <b>Result:</b> Domestic trips (Thai voters/travelers) represent <b>{demographics?.revenue?.[0]?.name === "Domestic (Thai)" ? ((demographics.revenue[0].value / (demographics.revenue[0].value + demographics.revenue[1].value)) * 100).toFixed(0) : "..."}%</b> of total revenue recorded during this period, signifying domestic stability during global volatility.
+             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
+              Comparison of Domestic vs Foreign market shares to evaluate tourism sector resilience.
             </p>
-            <div style={{ display: 'flex', height: '70%', gap: '1rem', alignItems:'center' }}>
+            <div style={{ display: 'flex', height: '65%', gap: '1rem', alignItems:'center' }}>
               <div style={{ flex: 1 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={demographics?.revenue} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={2}>
-                      {demographics?.revenue.map((_e: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    <Pie data={demographics?.revenue} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={40} outerRadius={60}>
+                      {demographics?.revenue?.map((_e: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
-                    <Tooltip formatter={(v: number) => formatValue(v)} />
+                    <Tooltip formatter={(v: any) => formatValue(Number(v) || 0)} />
                   </PieChart>
                 </ResponsiveContainer>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '0.75rem', marginTop:'10px' }}>
-                  <span style={{ color: COLORS[0] }}>● Domestic (Thai)</span>
-                  <span style={{ color: COLORS[1] }}>● Foreign</span>
-                </div>
               </div>
-              <div style={{ flex: 1 }}>
-                 <div style={{ fontSize: '0.75rem', color: '#94a3b8', textAlign: 'center', marginBottom:'10px' }}>Annual Volume (Millions)</div>
-                 <ResponsiveContainer width="100%" height="90%">
+              <div style={{ flex: 1.5 }}>
+                 <ResponsiveContainer width="100%" height="80%">
                     <BarChart data={yearlyTrend}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
                       <XAxis dataKey="year" stroke="var(--text-muted)" fontSize={10} />
                       <YAxis stroke="var(--text-muted)" fontSize={10} tickFormatter={(v) => `${(v/1e6).toFixed(0)}M`} />
-                      <Tooltip labelStyle={{color: 'black'}} formatter={(v: number) => formatNumber(v)} />
-                      <Bar dataKey="no_tourist_all" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="no_tourist_all" fill="#3b82f699" radius={[2, 2, 0, 0]} />
                     </BarChart>
                  </ResponsiveContainer>
               </div>
             </div>
           </div>
 
-          {/* Diagnosis & Mapping Section */}
-          <div className="glass-panel chart-card half" style={{ height: '600px' }}>
+          <div className="glass-panel chart-card half" style={{ height: '550px' }}>
             <div className="chart-header">
-              <h3 className="chart-title" style={{ color: '#ef4444' }}>Diagnosis: Carrying Capacity Sentinel</h3>
+              <h3 className="chart-title" style={{ color: '#ef4444' }}>Sustainability Alert: Overtourism Sentinel</h3>
             </div>
-             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-              <b>Indicator:</b> We applied a statistical Carrying Capacity Index (CCI). Provinces like Koh Samui and Phuket often breach the 1.0 threshold during high-season, indicating overtourism stress.
+             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
+              <b>Model:</b> Carrying Capacity Index (CCI). <br/>
+              Provinces with CCI &gt; 1.2 are flagged for potential structural stress, requiring policy intervention to preserve local heritage.
             </p>
-            <ResponsiveContainer width="100%" height="35%">
+            <ResponsiveContainer width="100%" height="30%">
               <BarChart data={cciRedZones} layout="vertical" margin={{ left: 50, right: 30 }}>
                 <YAxis dataKey="province_eng" type="category" stroke="var(--text-muted)" width={110} fontSize={11} />
                 <XAxis type="number" stroke="var(--text-muted)" hide />
-                <Tooltip labelStyle={{color: 'black'}} formatter={(val) => Number(val).toFixed(2)} />
-                <Bar dataKey="CCI" fill="#ef444499" stroke="#ef4444" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="CCI" fill="#ef444466" stroke="#ef4444" radius={[0, 2, 2, 0]} />
               </BarChart>
             </ResponsiveContainer>
 
-            <div style={{ marginTop: '2rem' }}>
-              <h4 style={{ color: '#4ade80', marginBottom: '0.5rem', fontSize: '1rem' }}>Prescriptive Growth Zones (Secondary):</h4>
-              <p style={{color:'var(--text-muted)', fontSize:'0.8rem', marginBottom:'12px'}}>Targeted recommendation engine identifying locales with CCI &lt; 0.8:</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
+            <div style={{ marginTop: '1.5rem' }}>
+              <h4 style={{ color: '#4ade80', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Sustainable Investment Zones (CCI &lt; 0.8):</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '0.5rem' }}>
                 {cci.filter((c: any) => c.Zone === 'Green').slice(0, 4).map((c: any, i) => (
-                  <div key={i} style={{ padding: '0.75rem', background: 'rgba(74, 222, 128, 0.05)', borderRadius: '12px', borderLeft: '3px solid #4ade80', backdropFilter:'blur(5px)' }}>
-                    <div style={{ fontSize: '0.9rem', fontWeight: '800' }}>{c.province_eng}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', alignItems:'center' }}>
-                      <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{c.region_eng}</span>
-                      <strong style={{ color: '#4ade80', fontSize: '0.8rem', background:'rgba(74,222,128,0.1)', padding:'2px 6px', borderRadius:'4px' }}>CCI: {c.CCI.toFixed(2)}</strong>
+                  <div key={i} style={{ padding: '0.6rem', background: 'rgba(74, 222, 128, 0.03)', borderRadius: '4px', borderLeft: '2px solid #4ade80' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>{c.province_eng}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '4px', color: '#94a3b8' }}>
+                      <span>{c.region_eng}</span>
+                      <strong style={{ color: '#4ade80' }}>CCI: {Number(c.CCI).toFixed(2)}</strong>
                     </div>
                   </div>
                 ))}
@@ -257,15 +247,15 @@ export default function Dashboard({ user }: { user: any }) {
             </div>
           </div>
           
-          <div className="glass-panel chart-card half" style={{ height: '600px' }}>
+          <div className="glass-panel chart-card half" style={{ height: '550px' }}>
             <div className="chart-header">
-              <h3 className="chart-title"><Map size={20} style={{display:'inline', verticalAlign:'bottom', marginRight:'8px'}}/> Spatial Dispersal Strategy</h3>
+              <h3 className="chart-title">Regional Growth Strategy Map</h3>
             </div>
-             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-              <b>Geospatial Output:</b> This interactive map pins our ML-derived hotspots. Hover over markers to see real-time CCI capacity metrics processed by the Python engine.
+             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
+              Geospatial visualization of priority action zones. Red markers indicate saturated areas; Green markers represent sustainable growth potential.
             </p>
-            <div style={{ width: '100%', height: '78%', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
-              <iframe src="/data/thailand_map.html" title="Thailand Map" width="100%" height="100%" style={{ border: 'none' }} />
+            <div style={{ width: '100%', height: '75%', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
+              <iframe src="/data/thailand_map.html" title="Map" width="100%" height="100%" style={{ border: 'none' }} />
             </div>
           </div>
           
