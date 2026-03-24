@@ -1,0 +1,9 @@
+pandas
+numpy
+prophet
+jupyter
+jupytext
+matplotlib
+seaborn
+geopy
+folium

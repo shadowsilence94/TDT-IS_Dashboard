@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+dist/
+.env
+.ipynb_checkpoints/
+*.pyc
+__pycache__/
+web_app/.vite/
+web_app/dist/
+web_app/node_modules/
+# Keep the datasets for the progress report if small, but ignore if large. 
+# .parquet is usually compressed.
+# We'll allow data for now as it's a academic project.
