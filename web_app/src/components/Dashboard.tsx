@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { signOut } from '../firebase';
 import { auth } from '../firebase';
-import { XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area, BarChart, Bar, Legend, PieChart, Pie, Cell } from 'recharts';
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 const COLORS = ['#3b82f6', '#c084fc', '#4ade80', '#ef4444', '#f59e0b'];
 
