@@ -29,6 +29,7 @@ export default function Dashboard({ user }: { user: any }) {
   const [demographics, setDemographics] = useState<any>(null);
   const [modelParams, setModelParams] = useState<any>(null);
   const [simulatedVisitors, setSimulatedVisitors] = useState<number>(0);
+  const [cciZoneFilter, setCciZoneFilter] = useState<'Red' | 'Yellow' | 'Green'>('Red');
 
   useEffect(() => {
     fetch('/data/national_forecast.json').then(res => res.json()).then(setForecast).catch(console.error);
@@ -50,13 +51,19 @@ export default function Dashboard({ user }: { user: any }) {
     }
   };
 
-  const cciRedZones = cci.filter((c: any) => c.Zone === 'Red').slice(0, 5);
+  const filteredCci = cci
+    .filter((c: any) => c.Zone === cciZoneFilter)
+    .sort((a: any, b: any) => b.CCI - a.CCI)
+    .slice(0, 8);
+
   const totalTourists = regional.reduce((sum: number, r: any) => sum + (r.no_tourist_all || 0), 0);
   const totalRevenue = regional.reduce((sum: number, r: any) => sum + (r.revenue_all || 0), 0);
 
   const simulatedRevenue = modelParams 
     ? Math.max(0, (simulatedVisitors * modelParams.revenue_per_tourist + modelParams.intercept))
     : 0;
+
+  const zoneColors: Record<string, string> = { Red: '#ef4444', Yellow: '#f59e0b', Green: '#4ade80' };
 
   return (
     <div className="app-container">
@@ -66,7 +73,7 @@ export default function Dashboard({ user }: { user: any }) {
             <h1 style={{margin:0, fontSize:'2rem', letterSpacing:'-0.02em'}}>TDT-IS: Tourism Intelligence System</h1>
             <p style={{color:'var(--text-muted)', margin:'4px 0', fontSize:'0.95rem'}}>Phase 2 Progress Report | Sustainable Tourism & Regional Economic Balance</p>
             <div style={{ display: 'flex', flexWrap:'wrap', gap: '8px', marginTop: '12px' }}>
-              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.8rem', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.8rem', color: '#94a3b8', border: '1px solid rgba(255,b255,255,0.1)' }}>
                 TEAM: Alston, Subhajit, Santhosh, Htut Ko Ko
               </div>
               <div style={{ background: 'rgba(59, 130, 246, 0.1)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.8rem', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.2)' }}>
@@ -82,10 +89,10 @@ export default function Dashboard({ user }: { user: any }) {
           </div>
         </header>
 
-        <section style={{marginTop: '1.5rem', padding: '1.5rem', background: 'rgba(255,b255,255,0.02)', borderRadius: '8px', border:'1px solid var(--glass-border)'}}>
+        <section style={{marginTop: '1.5rem', padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border:'1px solid var(--glass-border)'}}>
             <h2 style={{fontSize:'1.1rem', marginBottom:'10px', color:'#f1f5f9'}}>Executive Summary & Policy Alignment</h2>
             <p style={{color:'var(--text-muted)', fontSize:'0.85rem', lineHeight:'1.6'}}>
-                This dashboard is designed for <b>Government Officials, policy makers, and tourism industry investors</b> to achieve <b>balanced economic growth</b> and <b>sustainable tourism practices</b>. All analytics are derived from verified MOTS 2019-2023 domestic tourism statistics.
+                This dashboard is designed for <b>Government Officials, policy makers, and tourism industry investors</b> to achieve <b>balanced economic growth</b> and <b>sustainable tourism practices</b>. Analytics derived from verified MOTS 2019-2023 statistics.
             </p>
         </section>
 
@@ -114,8 +121,7 @@ export default function Dashboard({ user }: { user: any }) {
                   Policy Tool: What-If Revenue Forecast Simulation
                 </h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.5' }}>
-                  <b>Model:</b> Scikit-Learn Linear Regression. <br/>
-                  <b>Logic:</b> Estimates revenue growth based on historical visitor-to-income coefficients.
+                  <b>Model:</b> Scikit-Learn Linear Regression. Estimates revenue growth based on historical visitor-to-income coefficients.
                 </p>
               </div>
               <div style={{ textAlign: 'right', background: 'rgba(255,255,255,0.03)', padding:'1rem 1.5rem', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.05)' }}>
@@ -150,7 +156,7 @@ export default function Dashboard({ user }: { user: any }) {
               <h3 className="chart-title">Arrival Projections (Prophet Forecasting)</h3>
             </div>
              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
-              <b>Model:</b> Facebook Prophet. Predicts demand to support proactive resource allocation.
+              <b>Model:</b> Facebook Prophet. Covers 2019 - 2027 demand projections.
             </p>
             <ResponsiveContainer width="100%" height="65%">
               <AreaChart data={forecast}>
@@ -181,14 +187,13 @@ export default function Dashboard({ user }: { user: any }) {
             </ResponsiveContainer>
           </div>
 
-          {/* Market Resilience REAL Data comparison */}
           <div className="glass-panel chart-card half" style={{ height: '450px' }}>
             <div className="chart-header">
               <h3 className="chart-title">Market Resilience (Real Shares)</h3>
             </div>
              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1.2rem', lineHeight: '1.4' }}>
-              <b>Analytical Insight:</b> Verification of 5 years of statistics shows that **Domestic travelers** are the primary volume driver. 
-              {demographics?.volume ? ` Domestic volume reached ${formatNumber(demographics.volume[0].value)} trips during this period.` : ' Calculating metrics...'}
+              Verification shows that **Domestic travelers** are the primary volume driver. 
+              {demographics?.volume ? ` Totaling ${formatNumber(demographics.volume[0].value)} Thai trips.` : ' Calculating metrics...'}
             </p>
             <div style={{ display: 'flex', height: '65%', gap: '1rem', alignItems:'center' }}>
               <div style={{ flex: 1 }}>
@@ -221,42 +226,37 @@ export default function Dashboard({ user }: { user: any }) {
           </div>
 
           <div className="glass-panel chart-card half" style={{ height: '550px' }}>
-            <div className="chart-header">
-              <h3 className="chart-title" style={{ color: '#ef4444' }}>Sustainability Alert: Overtourism Sentinel</h3>
+            <div className="chart-header" style={{display: 'flex', justifyContent:'space-between', alignItems:'center'}}>
+              <h3 className="chart-title" style={{ color: zoneColors[cciZoneFilter] }}>Sustainability Sentinel: Overtourism</h3>
+              <select 
+                value={cciZoneFilter} 
+                onChange={(e: any) => setCciZoneFilter(e.target.value)}
+                style={{ background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem' }}
+              >
+                <option value="Red">Red (Overtourism)</option>
+                <option value="Yellow">Yellow (Caution)</option>
+                <option value="Green">Green (Sustainable)</option>
+              </select>
             </div>
              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
-              <b>Model:</b> CCI. Provinces with &gt; 1.2 flag severe potential structural stress.
+              <b>Model:</b> CCI. {cciZoneFilter === 'Red' ? 'Indices > 1.2 flag structural stress.' : cciZoneFilter === 'Yellow' ? 'Indices 0.8-1.2 require monitoring.' : 'Indices < 0.8 indicate growth capacity.'}
             </p>
-            <ResponsiveContainer width="100%" height="30%">
-              <BarChart data={cciRedZones} layout="vertical" margin={{ left: 50, right: 30 }}>
+            <ResponsiveContainer width="100%" height="65%">
+              <BarChart data={filteredCci} layout="vertical" margin={{ left: 50, right: 30 }}>
                 <YAxis dataKey="province_eng" type="category" stroke="var(--text-muted)" width={110} fontSize={11} />
-                <XAxis type="number" stroke="var(--text-muted)" hide />
-                <Bar dataKey="CCI" fill="#ef444466" stroke="#ef4444" radius={[0, 2, 2, 0]} />
+                <XAxis type="number" stroke="var(--text-muted)" domain={[0, 'dataMax']} fontSize={10} />
+                <Tooltip labelStyle={{color: 'black'}} formatter={(v: any) => `CCI: ${Number(v).toFixed(2)}`} />
+                <Bar dataKey="CCI" fill={zoneColors[cciZoneFilter] + '66'} stroke={zoneColors[cciZoneFilter]} radius={[0, 2, 2, 0]} />
               </BarChart>
             </ResponsiveContainer>
-
-            <div style={{ marginTop: '1.5rem' }}>
-              <h4 style={{ color: '#4ade80', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Sustainable Growth Zones:</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '0.5rem' }}>
-                {cci.filter((c: any) => c.Zone === 'Green').slice(0, 4).map((c: any, i) => (
-                  <div key={i} style={{ padding: '0.6rem', background: 'rgba(74, 222, 128, 0.03)', borderRadius: '4px', borderLeft: '2px solid #4ade80' }}>
-                    <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>{c.province_eng}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '4px', color: '#94a3b8' }}>
-                      <span>{c.region_eng}</span>
-                      <strong style={{ color: '#4ade80' }}>CCI: {Number(c.CCI).toFixed(2)}</strong>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
           
           <div className="glass-panel chart-card half" style={{ height: '550px' }}>
             <div className="chart-header">
-              <h3 className="chart-title">Regional Strategy Strategy Map</h3>
+              <h3 className="chart-title">Regional Strategy Geography</h3>
             </div>
              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
-              Geospatial visualization of priority action zones.
+              Geospatial prioritization. Red: Saturated | Orange: Monitor | Green: Growth.
             </p>
             <div style={{ width: '100%', height: '75%', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
               <iframe src="/data/thailand_map.html" title="Map" width="100%" height="100%" style={{ border: 'none' }} />
