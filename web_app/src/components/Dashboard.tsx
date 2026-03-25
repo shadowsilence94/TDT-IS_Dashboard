@@ -26,21 +26,21 @@ export default function Dashboard({ user }: { user: any }) {
   const [cci, setCci] = useState([]);
   const [regional, setRegional] = useState([]);
   const [topProvinces, setTopProvinces] = useState([]);
-  const [demographics, setDemographics] = useState<any>(null);
+  const [demographics, setDemographics] = useState<any>({ revenue: [], volume: [] });
   const [modelParams, setModelParams] = useState<any>(null);
   const [simulatedVisitors, setSimulatedVisitors] = useState<number>(0);
   const [cciZoneFilter, setCciZoneFilter] = useState<'Red' | 'Yellow' | 'Green'>('Red');
 
   useEffect(() => {
-    fetch('/data/national_forecast.json').then(res => res.json()).then(setForecast).catch(console.error);
-    fetch('/data/cci_data.json').then(res => res.json()).then(setCci).catch(console.error);
-    fetch('/data/regional_summary.json').then(res => res.json()).then(setRegional).catch(console.error);
-    fetch('/data/top10_provinces.json').then(res => res.json()).then(setTopProvinces).catch(console.error);
-    fetch('/data/demographics.json').then(res => res.json()).then(setDemographics).catch(console.error);
+    fetch('/data/national_forecast.json').then(res => res.json()).then(setForecast).catch(err => console.error("Forecast err:", err));
+    fetch('/data/cci_data.json').then(res => res.json()).then(setCci).catch(err => console.error("CCI err:", err));
+    fetch('/data/regional_summary.json').then(res => res.json()).then(setRegional).catch(err => console.error("Regional err:", err));
+    fetch('/data/top10_provinces.json').then(res => res.json()).then(setTopProvinces).catch(err => console.error("Provinces err:", err));
+    fetch('/data/demographics.json').then(res => res.json()).then(setDemographics).catch(err => console.error("Demographics err:", err));
     fetch('/data/prediction_model.json').then(res => res.json()).then(data => {
       setModelParams(data);
-      setSimulatedVisitors(data.baseline_visitors || 10000000);
-    }).catch(console.error);
+      if (data.baseline_visitors) setSimulatedVisitors(data.baseline_visitors);
+    }).catch(err => console.error("Model err:", err));
   }, []);
 
   const handleLogout = async () => {
@@ -193,15 +193,15 @@ export default function Dashboard({ user }: { user: any }) {
             </div>
              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1.2rem', lineHeight: '1.4' }}>
               Verification shows that **Domestic travelers** are the primary volume driver. 
-              {demographics?.volume ? ` Totaling ${formatNumber(demographics.volume[0].value)} Thai trips.` : ' Calculating metrics...'}
+              {demographics?.volume?.length > 0 ? ` Contributing ${formatNumber(demographics.volume[0].value)} trips historically.` : ' Calculating metrics...'}
             </p>
             <div style={{ display: 'flex', height: '65%', gap: '1rem', alignItems:'center' }}>
               <div style={{ flex: 1 }}>
                 <div style={{fontSize:'0.65rem', color:'#94a3b8', textAlign:'center', marginBottom:'4px'}}>REVENUE SHARE</div>
                 <ResponsiveContainer width="100%" height="90%">
                   <PieChart>
-                    <Pie data={demographics?.revenue} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={35} outerRadius={55}>
-                      {demographics?.revenue?.map((_e: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    <Pie data={demographics?.revenue || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={35} outerRadius={55}>
+                      {(demographics?.revenue || []).map((_e: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
                     <Tooltip formatter={(v: any) => formatValue(Number(v) || 0)} />
                   </PieChart>
@@ -211,8 +211,8 @@ export default function Dashboard({ user }: { user: any }) {
                 <div style={{fontSize:'0.65rem', color:'#94a3b8', textAlign:'center', marginBottom:'4px'}}>VOLUME SHARE (TRIPS)</div>
                 <ResponsiveContainer width="100%" height="90%">
                   <PieChart>
-                    <Pie data={demographics?.volume} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={35} outerRadius={55}>
-                      {demographics?.volume?.map((_e: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    <Pie data={demographics?.volume || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={35} outerRadius={55}>
+                      {(demographics?.volume || []).map((_e: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
                     <Tooltip formatter={(v: any) => formatNumber(Number(v) || 0)} />
                   </PieChart>
@@ -244,7 +244,7 @@ export default function Dashboard({ user }: { user: any }) {
             <ResponsiveContainer width="100%" height="65%">
               <BarChart data={filteredCci} layout="vertical" margin={{ left: 50, right: 30 }}>
                 <YAxis dataKey="province_eng" type="category" stroke="var(--text-muted)" width={110} fontSize={11} />
-                <XAxis type="number" stroke="var(--text-muted)" domain={[0, 'dataMax']} fontSize={10} />
+                <XAxis type="number" stroke="var(--text-muted)" domain={[0, 'auto']} fontSize={10} />
                 <Tooltip labelStyle={{color: 'black'}} formatter={(v: any) => `CCI: ${Number(v).toFixed(2)}`} />
                 <Bar dataKey="CCI" fill={zoneColors[cciZoneFilter] + '66'} stroke={zoneColors[cciZoneFilter]} radius={[0, 2, 2, 0]} />
               </BarChart>
