@@ -239,7 +239,7 @@ export default function Dashboard({ user }: { user: any }) {
               </select>
             </div>
              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
-              <b>Model:</b> CCI. {cciZoneFilter === 'Red' ? 'Indices > 1.2 flag structural stress.' : cciZoneFilter === 'Yellow' ? 'Indices 0.8-1.2 require monitoring.' : 'Indices < 0.8 indicate growth capacity.'}
+              <b>Analysis:</b> {cciZoneFilter === 'Red' ? 'Critical provinces like Suphan Buri and Samut Songkhram exceed their carrying capacities, indicating severe stress on local resources and infrastructure, necessitating immediate management interventions.' : cciZoneFilter === 'Yellow' ? 'Provinces such as Nonthaburi and Phra Nakhon Si Ayutthaya show caution with their carrying capacities nearing limits, suggesting the need for sustainable strategies to prevent overtourism and protect local assets.' : 'Regions like Nakhon Ratchasima and Phuket fall within sustainable levels, encouraging travel to these areas can help preserve natural resources while promoting balanced tourism growth.'}
             </p>
             <ResponsiveContainer width="100%" height="65%">
               <BarChart data={filteredCci} layout="vertical" margin={{ left: 50, right: 30 }}>
