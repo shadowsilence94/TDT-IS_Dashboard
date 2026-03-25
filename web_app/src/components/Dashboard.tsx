@@ -239,7 +239,7 @@ export default function Dashboard({ user }: { user: any }) {
               </select>
             </div>
              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
-              <b>Analysis:</b> {cciZoneFilter === 'Red' ? 'Critical provinces like Suphan Buri and Samut Songkhram exceed their carrying capacities, indicating severe stress on local resources and infrastructure, necessitating immediate management interventions.' : cciZoneFilter === 'Yellow' ? 'Provinces such as Nonthaburi and Phra Nakhon Si Ayutthaya show caution with their carrying capacities nearing limits, suggesting the need for sustainable strategies to prevent overtourism and protect local assets.' : 'Regions like Nakhon Ratchasima and Phuket fall within sustainable levels, encouraging travel to these areas can help preserve natural resources while promoting balanced tourism growth.'}
+              <b>Analysis:</b> {cciZoneFilter === 'Red' ? 'Critical hubs including Phuket, Chiang Mai, and Bangkok, along with high-pressure zones like Suphan Buri and Samut Songkhram, exceed their structural carrying capacities (CCI > 0.9), signaling a need for intervention.' : cciZoneFilter === 'Yellow' ? 'Secondary areas such as Nonthaburi and Phra Nakhon Si Ayutthaya show caution with capacities nearing limits, suggesting the need for sustainable strategies to prevent overtourism.' : 'Provinces like Nakhon Ratchasima fall within sustainable levels with ample infrastructure buffer, allowing for further balanced tourism growth.'}
             </p>
             <ResponsiveContainer width="100%" height="65%">
               <BarChart data={filteredCci} layout="vertical" margin={{ left: 50, right: 30 }}>
@@ -256,7 +256,7 @@ export default function Dashboard({ user }: { user: any }) {
               <h3 className="chart-title">Regional Strategy Geography</h3>
             </div>
              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1rem' }}>
-              Geospatial prioritization. Red: Saturated | Orange: Monitor | Green: Growth.
+              Geospatial prioritization. Red: Saturated | Yellow: Monitoring | Green: Sustainable Growth.
             </p>
             <div style={{ width: '100%', height: '75%', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
               <iframe src="/data/thailand_map.html" title="Map" width="100%" height="100%" style={{ border: 'none' }} />
