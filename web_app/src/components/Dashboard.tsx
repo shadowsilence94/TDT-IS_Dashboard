@@ -32,15 +32,15 @@ export default function Dashboard({ user }: { user: any }) {
   const [cciZoneFilter, setCciZoneFilter] = useState<'Red' | 'Yellow' | 'Green'>('Red');
 
   useEffect(() => {
-    fetch('/data/national_forecast.json').then(res => res.json()).then(setForecast).catch(err => console.error("Forecast err:", err));
-    fetch('/data/cci_data.json').then(res => res.json()).then(setCci).catch(err => console.error("CCI err:", err));
-    fetch('/data/regional_summary.json').then(res => res.json()).then(setRegional).catch(err => console.error("Regional err:", err));
-    fetch('/data/top10_provinces.json').then(res => res.json()).then(setTopProvinces).catch(err => console.error("Provinces err:", err));
-    fetch('/data/demographics.json').then(res => res.json()).then(setDemographics).catch(err => console.error("Demographics err:", err));
+    fetch('/data/national_forecast.json').then(res => res.json()).then(setForecast).catch(console.error);
+    fetch('/data/cci_data.json').then(res => res.json()).then(setCci).catch(console.error);
+    fetch('/data/regional_summary.json').then(res => res.json()).then(setRegional).catch(console.error);
+    fetch('/data/top10_provinces.json').then(res => res.json()).then(setTopProvinces).catch(console.error);
+    fetch('/data/demographics.json').then(res => res.json()).then(setDemographics).catch(console.error);
     fetch('/data/prediction_model.json').then(res => res.json()).then(data => {
       setModelParams(data);
       if (data.baseline_visitors) setSimulatedVisitors(data.baseline_visitors);
-    }).catch(err => console.error("Model err:", err));
+    }).catch(console.error);
   }, []);
 
   const handleLogout = async () => {
@@ -195,23 +195,23 @@ export default function Dashboard({ user }: { user: any }) {
               Verification shows that **Domestic travelers** are the primary volume driver. 
               {demographics?.volume?.length > 0 ? ` Contributing ${formatNumber(demographics.volume[0].value)} trips historically.` : ' Calculating metrics...'}
             </p>
-            <div style={{ display: 'flex', height: '65%', gap: '1rem', alignItems:'center' }}>
-              <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', height: '180px', gap: '1rem', alignItems:'center' }}>
+              <div style={{ flex: 1, height: '100%' }}>
                 <div style={{fontSize:'0.65rem', color:'#94a3b8', textAlign:'center', marginBottom:'4px'}}>REVENUE SHARE</div>
-                <ResponsiveContainer width="100%" height="90%">
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={demographics?.revenue || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={35} outerRadius={55}>
+                    <Pie data={demographics?.revenue || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={40} outerRadius={60}>
                       {(demographics?.revenue || []).map((_e: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
                     <Tooltip formatter={(v: any) => formatValue(Number(v) || 0)} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, height: '100%' }}>
                 <div style={{fontSize:'0.65rem', color:'#94a3b8', textAlign:'center', marginBottom:'4px'}}>VOLUME SHARE (TRIPS)</div>
-                <ResponsiveContainer width="100%" height="90%">
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={demographics?.volume || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={35} outerRadius={55}>
+                    <Pie data={demographics?.volume || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={40} outerRadius={60}>
                       {(demographics?.volume || []).map((_e: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
                     <Tooltip formatter={(v: any) => formatNumber(Number(v) || 0)} />
@@ -219,9 +219,9 @@ export default function Dashboard({ user }: { user: any }) {
                 </ResponsiveContainer>
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '0.7rem', marginTop:'5px' }}>
-                <span style={{ color: COLORS[0] }}>● Domestic (Thai)</span>
-                <span style={{ color: COLORS[1] }}>● Foreign</span>
+            <div style={{ display: 'flex', justifyContent: 'space-around', gap: '1rem', fontSize: '0.75rem', marginTop:'15px', color:'white' }}>
+                <div style={{display:'flex', alignItems:'center', gap:'6px'}}><div style={{width:10, height:10, borderRadius:'50%', background:COLORS[0]}}></div> Domestic (Thai)</div>
+                <div style={{display:'flex', alignItems:'center', gap:'6px'}}><div style={{width:10, height:10, borderRadius:'50%', background:COLORS[1]}}></div> Foreign</div>
             </div>
           </div>
 
