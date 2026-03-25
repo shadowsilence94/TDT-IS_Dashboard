@@ -54,7 +54,7 @@ export default function Dashboard({ user }: { user: any }) {
   const filteredCci = cci
     .filter((c: any) => c.Zone === cciZoneFilter)
     .sort((a: any, b: any) => b.CCI - a.CCI)
-    .slice(0, 8);
+    .slice(0, 25);
 
   const totalTourists = regional.reduce((sum: number, r: any) => sum + (r.no_tourist_all || 0), 0);
   const totalRevenue = regional.reduce((sum: number, r: any) => sum + (r.revenue_all || 0), 0);
@@ -225,7 +225,7 @@ export default function Dashboard({ user }: { user: any }) {
             </div>
           </div>
 
-          <div className="glass-panel chart-card half" style={{ height: '550px' }}>
+          <div className="glass-panel chart-card half" style={{ height: '1200px' }}>
             <div className="chart-header" style={{display: 'flex', justifyContent:'space-between', alignItems:'center'}}>
               <h3 className="chart-title" style={{ color: zoneColors[cciZoneFilter] }}>Sustainability Sentinel: Overtourism</h3>
               <select 
